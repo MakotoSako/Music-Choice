@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>MP3 連続再生プレイヤー</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+        #now-playing { font-size: 1.2em; font-weight: bold; color: #333; margin: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Music-Choice 連続プレイヤー</h1>
+    <div id="now-playing">読み込み中...</div>
+    <audio id="audio-player" controls></audio>
+
+    <script>
+        // 曲リストの自動生成 (001 〜 020)
+        const playlist = [];
+        for (let i = 1; i <= 20; i++) {
+            // 3桁のゼロ埋め (001, 002 ... 020)
+            const filename = String(i).padStart(3, '0') + '.mp3';
+            playlist.push(filename);
+        }
+
+        let currentIndex = 0;
+        const player = document.getElementById('audio-player');
+        const nowPlayingText = document.getElementById('now-playing');
+
+        function playTrack(index) {
+            if (index >= playlist.length) {
+                nowPlayingText.textContent = "すべての曲の再生が終了しました";
+                return;
+            }
+            currentIndex = index;
+            player.src = playlist[currentIndex];
+            nowPlayingText.textContent = `再生中: ${playlist[currentIndex]} (${currentIndex + 1}/20)`;
+            player.play().catch(e => {
+                console.log("自動再生がブロックされました。再生ボタンを押してください。", e);
+            });
+        }
+
+        // 1曲終わったら次の曲へ自動で進む
+        player.addEventListener('ended', () => {
+            playTrack(currentIndex + 1);
+        });
+
+        // 初期化（最初の曲をセット）
+        if (playlist.length > 0) {
+            player.src = playlist[0];
+            nowPlayingText.textContent = `準備完了: ${playlist[0]} (1/20)`;
+        }
+    </script>
+
+</body>
+</html>
