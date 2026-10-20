@@ -60,17 +60,17 @@
             box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.4);
         }
         .playing-active-item {
-            background: linear-gradient(90deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%) !important;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.35) 0%, rgba(139, 92, 246, 0.3) 100%) !important;
             border-color: rgba(129, 140, 248, 0.9) !important;
             box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.4), inset 0 0 10px rgba(99, 102, 241, 0.15) !important;
             transform: scale(1.01);
         }
         @keyframes eq-bounce {
             0%, 100% { height: 4px; }
-            50% { height: 14px; }
+            50% { height: 16px; }
         }
         .eq-bar {
-            width: 2.5px;
+            width: 3px;
             background-color: #818cf8;
             border-radius: 2px;
             animation: eq-bounce 0.8s ease-in-out infinite;
@@ -79,48 +79,37 @@
         .eq-bar:nth-child(3) { animation-delay: 0.4s; }
     </style>
 </head>
-<body class="min-h-screen text-slate-100 flex flex-col justify-between p-3 sm:p-6 md:p-8 selection:bg-indigo-500 selection:text-white">
+<body class="min-h-screen text-slate-100 flex flex-col justify-between p-3 sm:p-6 md:p-8 selection:bg-indigo-500 selection:text-white text-base">
 
-    <!-- Header Section -->
-    <header class="max-w-5xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
-        <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+    <!-- Header Section (スマホ対応：大きく見やすいタイトルとご注文ボタン) -->
+    <header class="max-w-5xl mx-auto w-full flex flex-col gap-3 mb-4 sm:mb-6">
+        <div class="flex items-center justify-between gap-3 w-full">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 shrink-0">
-                    <i class="fa-solid font-bold text-lg sm:text-xl fa-music"></i>
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30 shrink-0">
+                    <i class="fa-solid font-bold text-xl sm:text-2xl fa-music"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg sm:text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-200 leading-tight">
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-indigo-200 leading-tight">
                         あなたの曲をつくりませんか？
                     </h1>
                 </div>
             </div>
-            <!-- モバイル時のみ右上にミニ注文リンクを配置 -->
+            
+            <!-- デスクトップ用ご注文ボタン -->
             <a href="mailto:sakomakoto7@gmail.com?subject=%E3%80%90%E3%81%94%E6%B3%A8%E6%96%87%E3%80%91%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%9B%B2%E3%82%92%E3%81%A4%E3%81%8F%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93%E3%81%8B%EF%BC%9F" 
-               class="sm:hidden bg-gradient-to-r from-amber-500 to-rose-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-md shadow-rose-500/20 flex items-center gap-1.5 shrink-0 active:scale-95">
-                <i class="fa-solid fa-envelope"></i>
-                <span>注文</span>
+               class="hidden md:inline-flex bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white px-5 py-2.5 rounded-xl text-base font-bold transition-all border border-amber-300/30 items-center gap-2 shadow-lg shadow-rose-500/25 hover:scale-105 active:scale-95">
+                <i class="fa-solid fa-envelope text-lg"></i>
+                <span>ご注文はこちらに</span>
             </a>
         </div>
 
-        <!-- Controls (PC/Tablet & Mobile Fallback) -->
-        <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <!-- デスクトップ用 ご注文ボタン -->
+        <!-- モバイル専用：画面いっぱいに目立つ押しやすいご注文ボタン -->
+        <div class="md:hidden w-full">
             <a href="mailto:sakomakoto7@gmail.com?subject=%E3%80%90%E3%81%94%E6%B3%A8%E6%96%87%E3%80%91%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%9B%B2%E3%82%92%E3%81%A4%E3%81%8F%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93%E3%81%8B%EF%BC%9F" 
-               class="hidden sm:flex bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 border border-amber-300/30 items-center gap-2 shadow-lg shadow-rose-500/20 hover:scale-105 active:scale-95">
-                <i class="fa-solid fa-envelope"></i>
-                <span>ご注文はこちらに</span>
+               class="w-full bg-gradient-to-r from-amber-500 via-rose-500 to-pink-500 text-white py-3 px-4 rounded-2xl text-base font-bold shadow-lg shadow-rose-500/30 flex items-center justify-center gap-2 active:scale-98 transition">
+                <i class="fa-solid fa-envelope text-lg"></i>
+                <span>ご注文はこちらに（メール作成）</span>
             </a>
-            <!-- フォルダ / ファイル追加ボタン -->
-            <label class="cursor-pointer bg-indigo-600/80 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border border-indigo-400/30 flex items-center gap-1.5 shadow-md">
-                <i class="fa-solid fa-folder-open text-xs sm:text-sm"></i>
-                <span class="hidden xs:inline">フォルダ</span>
-                <input type="file" id="folderInput" webkitdirectory directory multiple accept="audio/mp3,audio/*" class="hidden">
-            </label>
-            <label class="cursor-pointer bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border border-slate-700/50 flex items-center gap-1.5 shadow-sm">
-                <i class="fa-solid fa-file-audio text-purple-400 text-xs sm:text-sm"></i>
-                <span class="hidden xs:inline">ファイル</span>
-                <input type="file" id="fileInput" multiple accept="audio/mp3,audio/*" class="hidden">
-            </label>
         </div>
     </header>
 
@@ -128,111 +117,110 @@
     <main class="max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-start my-auto">
         
         <!-- Left / Top: Current Track Artwork & Info (Player View) -->
-        <section class="lg:col-span-5 flex flex-col items-center bg-slate-900/60 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-800/80 shadow-2xl relative overflow-hidden">
-            <div id="ambientBg" class="absolute -inset-10 bg-indigo-600/10 blur-3xl rounded-full pointer-events-none transition-all duration-700"></div>
+        <section class="lg:col-span-5 flex flex-col items-center bg-slate-900/70 backdrop-blur-xl p-5 sm:p-7 md:p-8 rounded-3xl border border-slate-800 shadow-2xl relative overflow-hidden">
+            <div id="ambientBg" class="absolute -inset-10 bg-indigo-600/15 blur-3xl rounded-full pointer-events-none transition-all duration-700"></div>
 
-            <!-- Artwork Container (スマホではコンパクト化) -->
-            <div class="relative w-36 h-36 xs:w-44 xs:h-44 sm:w-60 sm:h-60 my-2 sm:my-4 group">
-                <div id="artworkContainer" class="w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 bg-slate-800 flex items-center justify-center transition-all duration-300 relative z-10">
+            <!-- Artwork Container (スマホでは程よいサイズ、PCでは迫力あるサイズ) -->
+            <div class="relative w-40 h-40 sm:w-56 sm:h-56 my-2 group">
+                <div id="artworkContainer" class="w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700/60 bg-slate-800 flex items-center justify-center transition-all duration-300 relative z-10">
                     <img id="albumArt" src="" alt="Album Art" class="w-full h-full object-cover hidden">
-                    <div id="albumArtPlaceholder" class="flex flex-col items-center justify-center text-slate-500 gap-2 sm:gap-3">
-                        <i class="fa-solid fa-compact-disc text-4xl sm:text-6xl text-indigo-400/60 animate-spin" style="animation-duration: 12s;"></i>
-                        <span id="artPlaceholderText" class="text-[10px] sm:text-xs font-semibold tracking-wider text-slate-400">NO ARTWORK</span>
+                    <div id="albumArtPlaceholder" class="flex flex-col items-center justify-center text-slate-400 gap-3">
+                        <i class="fa-solid fa-compact-disc text-5xl sm:text-6xl text-indigo-400/80 animate-spin" style="animation-duration: 12s;"></i>
+                        <span id="artPlaceholderText" class="text-xs sm:text-sm font-semibold tracking-wider text-slate-400">PLAYING</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Track Meta Info (スマホで文字を大きく・見やすく) -->
-            <div class="w-full text-center mt-1 sm:mt-2 z-10">
-                <h2 id="currentTitle" class="text-base sm:text-xl font-bold text-white truncate px-2" title="Let's together with osakafringe">
+            <!-- Track Meta Info (スマホでもはっきり大きな文字) -->
+            <div class="w-full text-center mt-3 z-10 px-1">
+                <h2 id="currentTitle" class="text-lg sm:text-2xl font-bold text-white leading-snug px-1" title="Let's together with osakafringe">
                     Let's together with osakafringe
                 </h2>
-                <p id="currentArtist" class="text-xs sm:text-sm text-slate-300 truncate mt-1">
+                <p id="currentArtist" class="text-sm sm:text-base font-medium text-indigo-300 mt-1.5">
                     rojiura_m_sakou
                 </p>
-                <p id="currentAlbum" class="text-[11px] sm:text-xs text-indigo-400/90 truncate mt-0.5">
+                <p id="currentAlbum" class="text-xs sm:text-sm text-slate-400 mt-1">
                     あなたの曲をつくりませんか？ (001.mp3)
                 </p>
             </div>
 
-            <!-- Status Banner -->
-            <div id="statusToast" class="hidden mt-3 text-xs text-indigo-300 bg-indigo-950/70 border border-indigo-800/50 px-3 py-1 rounded-full text-center">
-            </div>
+            <div id="statusToast" class="hidden mt-3 text-sm text-indigo-200 bg-indigo-950/80 border border-indigo-700 px-4 py-1.5 rounded-full text-center"></div>
         </section>
 
         <!-- Right / Bottom: Controls & Playlist View -->
-        <section class="lg:col-span-7 flex flex-col gap-4 sm:gap-6 bg-slate-900/60 backdrop-blur-xl p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl border border-slate-800/80 shadow-2xl">
+        <section class="lg:col-span-7 flex flex-col gap-4 sm:gap-6 bg-slate-900/70 backdrop-blur-xl p-5 sm:p-7 md:p-8 rounded-3xl border border-slate-800 shadow-2xl">
             
             <!-- Player Controller -->
-            <div class="space-y-3 sm:space-y-4">
+            <div class="space-y-4">
                 <!-- Seek Bar & Time Display -->
                 <div>
-                    <div class="flex justify-between text-xs sm:text-sm text-slate-300 font-medium mb-1">
+                    <div class="flex justify-between text-sm sm:text-base text-slate-200 font-semibold mb-1.5 px-0.5">
                         <span id="currentTime">0:00</span>
                         <span id="duration">0:00</span>
                     </div>
-                    <input type="range" id="seekBar" min="0" max="100" value="0" class="w-full py-1">
+                    <!-- スマホで触りやすい太めのシークバー -->
+                    <input type="range" id="seekBar" min="0" max="100" value="0" class="w-full py-2">
                 </div>
 
-                <!-- Main Buttons Control Panel (タッチしやすいサイズ) -->
-                <div class="flex items-center justify-between pt-1 sm:pt-2">
+                <!-- Main Buttons Control Panel (大型化＆タップしやすい設計) -->
+                <div class="flex items-center justify-between pt-1">
                     <!-- Mode Toggles (Shuffle/Repeat) -->
                     <div class="flex items-center gap-1 sm:gap-2">
-                        <button id="shuffleBtn" class="p-2.5 sm:p-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition active:scale-95" title="シャッフル">
-                            <i class="fa-solid fa-shuffle text-sm sm:text-base"></i>
+                        <button id="shuffleBtn" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition active:scale-95" title="シャッフル">
+                            <i class="fa-solid fa-shuffle text-base sm:text-lg"></i>
                         </button>
-                        <button id="repeatBtn" class="p-2.5 sm:p-3 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition active:scale-95" title="1曲リピート">
-                            <i class="fa-solid fa-repeat text-sm sm:text-base"></i>
+                        <button id="repeatBtn" class="w-11 h-11 sm:w-12 sm:h-12 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition active:scale-95" title="1曲リピート">
+                            <i class="fa-solid fa-repeat text-base sm:text-lg"></i>
                         </button>
                     </div>
 
-                    <!-- Playback Controls (◀ ▶) -->
-                    <div class="flex items-center gap-3 sm:gap-4">
+                    <!-- Playback Controls (◀ ▶ 大きなボタン) -->
+                    <div class="flex items-center gap-3 sm:gap-5">
                         <!-- ◀ Previous -->
-                        <button id="prevBtn" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg active:scale-90" title="前へ (◀)">
-                            <i class="fa-solid fa-backward-step text-lg sm:text-xl"></i>
+                        <button id="prevBtn" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg active:scale-90 border border-slate-700/60" title="前へ (◀)">
+                            <i class="fa-solid fa-backward-step text-xl sm:text-2xl"></i>
                         </button>
 
-                        <!-- Play / Pause -->
-                        <button id="playPauseBtn" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition shadow-xl shadow-indigo-600/40 active:scale-90 glow-effect" title="再生 / 一時停止">
-                            <i id="playIcon" class="fa-solid fa-play text-xl sm:text-2xl ml-0.5"></i>
+                        <!-- Play / Pause (特大ボタン) -->
+                        <button id="playPauseBtn" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition shadow-xl shadow-indigo-600/40 active:scale-90 glow-effect" title="再生 / 一時停止">
+                            <i id="playIcon" class="fa-solid fa-play text-2xl sm:text-3xl ml-1"></i>
                         </button>
 
                         <!-- ▶ Next -->
-                        <button id="nextBtn" class="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg active:scale-90" title="次へ (▶)">
-                            <i class="fa-solid fa-forward-step text-lg sm:text-xl"></i>
+                        <button id="nextBtn" class="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg active:scale-90 border border-slate-700/60" title="次へ (▶)">
+                            <i class="fa-solid fa-forward-step text-xl sm:text-2xl"></i>
                         </button>
                     </div>
 
-                    <!-- Volume Control (スマホでも操作しやすい) -->
+                    <!-- Volume Control -->
                     <div class="flex items-center gap-1.5 sm:gap-2">
-                        <button id="muteBtn" class="p-2 sm:p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition active:scale-95" title="消音">
-                            <i id="volumeIcon" class="fa-solid fa-volume-high text-sm sm:text-base"></i>
+                        <button id="muteBtn" class="w-10 h-10 rounded-full text-slate-400 hover:text-white flex items-center justify-center active:scale-95" title="消音">
+                            <i id="volumeIcon" class="fa-solid fa-volume-high text-base sm:text-lg"></i>
                         </button>
-                        <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="0.8" class="w-14 xs:w-16 sm:w-20">
+                        <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="0.8" class="w-14 sm:w-20">
                     </div>
                 </div>
             </div>
 
-            <hr class="border-slate-800/80">
+            <hr class="border-slate-800">
 
             <!-- Playlist Header -->
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <h3 class="font-bold text-sm sm:text-base tracking-wide text-slate-200">連続再生リスト (001〜020)</h3>
-                    <span id="playlistCount" class="text-xs font-semibold bg-slate-800 text-indigo-400 px-2.5 py-0.5 rounded-full border border-slate-700/50">20 曲</span>
+                <div class="flex items-center gap-2.5">
+                    <h3 class="font-bold text-base sm:text-lg tracking-wide text-white">連続再生リスト (001〜020)</h3>
+                    <span id="playlistCount" class="text-xs sm:text-sm font-bold bg-slate-800 text-indigo-300 px-3 py-1 rounded-full border border-slate-700">20 曲</span>
                 </div>
             </div>
 
-            <!-- Playlist Scroll Area (スマホ向けスクロール領域 & タップ領域拡大) -->
-            <div id="playlistContainer" class="playlist-scroll max-h-64 sm:max-h-80 lg:max-h-72 overflow-y-auto space-y-2 pr-1">
+            <!-- Playlist Scroll Area (スマホで押しやすい大きな行の高さ) -->
+            <div id="playlistContainer" class="playlist-scroll max-h-80 sm:max-h-96 overflow-y-auto space-y-2.5 pr-1">
                 <!-- Track items will be dynamically generated here -->
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer class="max-w-5xl mx-auto w-full text-center text-[11px] sm:text-xs text-slate-400 my-3 sm:my-4">
+    <footer class="max-w-5xl mx-auto w-full text-center text-xs sm:text-sm text-slate-400 my-4">
         &copy; 2026 あなたの曲をつくりませんか？ - Audio Player
     </footer>
 
@@ -582,32 +570,32 @@
                 if (infoEl) infoEl.textContent = `${track.artist} • ${track.fileName}`;
 
                 if (idx === currentIndex) {
-                    item.className = 'playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 border text-white playing-active-item';
+                    item.className = 'playlist-item flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-300 border text-white playing-active-item';
                     
                     if (isPlaying) {
                         badge.innerHTML = `
-                            <div class="flex items-end justify-center gap-0.5 h-4 w-4">
+                            <div class="flex items-end justify-center gap-1 h-5 w-5">
                                 <span class="eq-bar"></span>
                                 <span class="eq-bar"></span>
                                 <span class="eq-bar"></span>
                             </div>
                         `;
                     } else {
-                        badge.innerHTML = `<i class="fa-solid fa-pause text-indigo-300 text-xs"></i>`;
+                        badge.innerHTML = `<i class="fa-solid fa-pause text-indigo-300 text-sm"></i>`;
                     }
-                    badge.className = 'track-badge w-8 h-8 rounded-lg bg-indigo-600/50 flex items-center justify-center shrink-0 border border-indigo-400/40 text-xs font-bold';
+                    badge.className = 'track-badge w-10 h-10 rounded-xl bg-indigo-600/50 flex items-center justify-center shrink-0 border border-indigo-400/40 text-sm font-bold';
 
-                    if (titleEl) titleEl.className = 'track-title text-sm sm:text-base font-bold text-white truncate drop-shadow-sm';
+                    if (titleEl) titleEl.className = 'track-title text-base sm:text-lg font-bold text-white truncate drop-shadow-sm';
                     if (rightIndicator) {
-                        rightIndicator.innerHTML = '<span class="text-[10px] uppercase tracking-wider bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-2 py-0.5 rounded-full font-semibold">再生中</span>';
+                        rightIndicator.innerHTML = '<span class="text-xs uppercase tracking-wider bg-indigo-500/30 text-indigo-200 border border-indigo-400/40 px-2.5 py-1 rounded-full font-bold">再生中</span>';
                     }
                 } else {
-                    item.className = 'playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 border bg-slate-800/40 border-slate-700/30 text-slate-300 hover:bg-slate-800/80 active:bg-slate-800';
+                    item.className = 'playlist-item flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border bg-slate-800/40 border-slate-700/40 text-slate-300 hover:bg-slate-800/80 active:bg-slate-800';
                     badge.innerHTML = String(idx + 1).padStart(2, '0');
-                    badge.className = 'track-badge w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-semibold text-slate-400 shrink-0';
-                    if (titleEl) titleEl.className = 'track-title text-sm sm:text-base font-medium text-slate-200 truncate';
+                    badge.className = 'track-badge w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-semibold text-slate-400 shrink-0';
+                    if (titleEl) titleEl.className = 'track-title text-base sm:text-lg font-semibold text-slate-200 truncate';
                     if (rightIndicator) {
-                        rightIndicator.innerHTML = '<i class="fa-solid fa-play text-xs text-slate-500"></i>';
+                        rightIndicator.innerHTML = '<i class="fa-solid fa-play text-sm text-slate-500"></i>';
                     }
                 }
             }
@@ -619,38 +607,37 @@
 
                 tracks.forEach((track, index) => {
                     const item = document.createElement('div');
-                    item.className = `playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 border ${
+                    item.className = `playlist-item flex items-center justify-between p-3.5 sm:p-4 rounded-2xl cursor-pointer transition-all duration-200 border ${
                         index === currentIndex
                             ? 'text-white playing-active-item'
-                            : 'bg-slate-800/40 border-slate-700/30 text-slate-300 hover:bg-slate-800/80 active:bg-slate-800'
+                            : 'bg-slate-800/40 border-slate-700/40 text-slate-300 hover:bg-slate-800/80 active:bg-slate-800'
                     }`;
 
                     item.addEventListener('click', (e) => {
-                        // 編集ボタン等のクリック時を除く
                         if (e.target.closest('.edit-btn')) return;
                         loadTrack(index);
                         playAudio();
                     });
 
                     item.innerHTML = `
-                        <div class="flex items-center gap-2.5 sm:gap-3 overflow-hidden pr-2 flex-1">
-                            <div class="track-badge w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-semibold text-slate-400 shrink-0">
+                        <div class="flex items-center gap-3 overflow-hidden pr-2 flex-1">
+                            <div class="track-badge w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-sm font-semibold text-slate-400 shrink-0">
                                 ${String(index + 1).padStart(2, '0')}
                             </div>
                             <div class="overflow-hidden flex-1">
-                                <p class="track-title text-sm sm:text-base font-medium truncate ${index === currentIndex ? 'text-white font-bold' : 'text-slate-200'}">
+                                <p class="track-title text-base sm:text-lg font-semibold truncate ${index === currentIndex ? 'text-white font-bold' : 'text-slate-200'}">
                                     ${track.title}
                                 </p>
-                                <p class="track-info text-xs text-slate-400 truncate mt-0.5">
+                                <p class="track-info text-xs sm:text-sm text-slate-400 truncate mt-1">
                                     ${track.artist} • ${track.fileName}
                                 </p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
-                            <button class="edit-btn p-2 text-slate-500 hover:text-indigo-300 rounded-lg transition active:scale-95" title="曲名を直接編集">
-                                <i class="fa-solid fa-pen text-xs"></i>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button class="edit-btn p-2.5 text-slate-400 hover:text-indigo-300 rounded-xl transition active:scale-95" title="曲名を直接編集">
+                                <i class="fa-solid fa-pen text-sm"></i>
                             </button>
-                            <div class="track-right-icon text-xs text-slate-500 w-4 text-center">
+                            <div class="track-right-icon text-sm text-slate-500 w-5 text-center">
                                 <i class="fa-solid fa-play"></i>
                             </div>
                         </div>
