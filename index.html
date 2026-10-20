@@ -2,55 +2,937 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>MP3 連続再生プレイヤー</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>あなたの曲をつくりませんか？</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: sans-serif; text-align: center; margin-top: 50px; }
-        #now-playing { font-size: 1.2em; font-weight: bold; color: #333; margin: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+        }
+        .playlist-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        .playlist-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        .playlist-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 14px;
+            width: 14px;
+            border-radius: 50%;
+            background: #6366f1;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -4px;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .glow-effect {
+            box-shadow: 0 0 25px -5px rgba(99, 102, 241, 0.4);
+        }
+        .playing-active-item {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.3) 0%, rgba(139, 92, 246, 0.25) 100%) !important;
+            border-color: rgba(129, 140, 248, 0.9) !important;
+            box-shadow: 0 0 20px -3px rgba(99, 102, 241, 0.4), inset 0 0 10px rgba(99, 102, 241, 0.15) !important;
+            transform: scale(1.01);
+        }
+        @keyframes eq-bounce {
+            0%, 100% { height: 4px; }
+            50% { height: 14px; }
+        }
+        .eq-bar {
+            width: 2.5px;
+            background-color: #818cf8;
+            border-radius: 2px;
+            animation: eq-bounce 0.8s ease-in-out infinite;
+        }
+        .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+        .eq-bar:nth-child(3) { animation-delay: 0.4s; }
     </style>
 </head>
-<body>
+<body class="min-h-screen text-slate-100 flex flex-col justify-between p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
 
-    <h1>Music-Choice 連続プレイヤー</h1>
-    <div id="now-playing">読み込み中...</div>
-    <audio id="audio-player" controls></audio>
+    <!-- Header Section -->
+    <header class="max-w-5xl mx-auto w-full flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">
+                <i class="fa-solid font-bold text-xl fa-music"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-200 to-indigo-200">
+                    あなたの曲をつくりませんか？
+                </h1>
+            </div>
+        </div>
+
+        <!-- File / Folder Loader Controls -->
+        <div class="flex items-center gap-2">
+            <a href="mailto:sakomakoto7@gmail.com?subject=%E3%80%90%E3%81%94%E6%B3%A8%E6%96%87%E3%80%91%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%9B%B2%E3%82%92%E3%81%A4%E3%81%8F%E3%82%8A%E3%81%BE%E3%81%9B%E3%82%93%E3%81%8B%EF%BC%9F" 
+               class="bg-gradient-to-r from-amber-500 to-rose-500 hover:from-amber-400 hover:to-rose-400 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 border border-amber-300/30 flex items-center gap-2 shadow-lg shadow-rose-500/20 hover:scale-105 active:scale-95">
+                <i class="fa-solid fa-envelope"></i>
+                <span>ご注文はこちらに</span>
+            </a>
+            <label class="cursor-pointer bg-indigo-600/80 hover:bg-indigo-500 text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border border-indigo-400/30 flex items-center gap-2 shadow-lg shadow-indigo-600/30">
+                <i class="fa-solid fa-folder-open"></i>
+                <span>フォルダ選択</span>
+                <input type="file" id="folderInput" webkitdirectory directory multiple accept="audio/mp3,audio/*" class="hidden">
+            </label>
+            <label class="cursor-pointer bg-slate-800/80 hover:bg-slate-700 text-slate-200 hover:text-white px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 border border-slate-700/50 flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-file-audio text-purple-400"></i>
+                <span>ファイル選択</span>
+                <input type="file" id="fileInput" multiple accept="audio/mp3,audio/*" class="hidden">
+            </label>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-start my-auto">
+        
+        <!-- Left: Current Track Artwork & Info (Player View) -->
+        <section class="lg:col-span-5 flex flex-col items-center bg-slate-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-800/80 shadow-2xl relative overflow-hidden">
+            <div id="ambientBg" class="absolute -inset-10 bg-indigo-600/10 blur-3xl rounded-full pointer-events-none transition-all duration-700"></div>
+
+            <!-- Artwork Container -->
+            <div class="relative w-48 h-48 sm:w-64 sm:h-64 my-4 group">
+                <div id="artworkContainer" class="w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 bg-slate-800 flex items-center justify-center transition-all duration-300 relative z-10">
+                    <img id="albumArt" src="" alt="Album Art" class="w-full h-full object-cover hidden">
+                    <div id="albumArtPlaceholder" class="flex flex-col items-center justify-center text-slate-500 gap-3">
+                        <i class="fa-solid fa-compact-disc text-6xl text-indigo-400/60 animate-spin" style="animation-duration: 12s;"></i>
+                        <span id="artPlaceholderText" class="text-xs font-medium tracking-wider text-slate-400">NO ARTWORK</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Track Meta Info -->
+            <div class="w-full text-center mt-2 z-10">
+                <h2 id="currentTitle" class="text-lg sm:text-xl font-bold text-white truncate px-2" title="Let's together with osakafringe">
+                    Let's together with osakafringe
+                </h2>
+                <p id="currentArtist" class="text-sm text-slate-400 truncate mt-1">
+                    rojiura_m_sakou
+                </p>
+                <p id="currentAlbum" class="text-xs text-indigo-400/80 truncate mt-0.5">
+                    あなたの曲をつくりませんか？ (001.mp3)
+                </p>
+            </div>
+
+            <!-- Status Banner -->
+            <div id="statusToast" class="mt-4 text-xs text-indigo-300 bg-indigo-950/70 border border-indigo-800/50 px-4 py-1.5 rounded-full transition-all duration-300 text-center">
+                上の「フォルダを一括選択」からMP3フォルダを指定するとID3タグを即座に全自動解析します
+            </div>
+        </section>
+
+        <!-- Right: Controls & Playlist View -->
+        <section class="lg:col-span-7 flex flex-col gap-6 bg-slate-900/60 backdrop-blur-xl p-6 sm:p-8 rounded-3xl border border-slate-800/80 shadow-2xl">
+            
+            <!-- Player Controller -->
+            <div class="space-y-4">
+                <!-- Seek Bar & Time Display -->
+                <div>
+                    <div class="flex justify-between text-xs text-slate-400 font-medium mb-1.5">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                    <input type="range" id="seekBar" min="0" max="100" value="0" class="w-full">
+                </div>
+
+                <!-- Main Buttons Control Panel -->
+                <div class="flex items-center justify-between pt-2">
+                    <!-- Mode Toggles (Shuffle/Repeat) -->
+                    <div class="flex items-center gap-2">
+                        <button id="shuffleBtn" class="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition" title="シャッフル">
+                            <i class="fa-solid fa-shuffle text-sm"></i>
+                        </button>
+                        <button id="repeatBtn" class="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition" title="1曲リピート">
+                            <i class="fa-solid fa-repeat text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Playback Controls (◀ ▶) -->
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <!-- ◀ Previous -->
+                        <button id="prevBtn" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg hover:scale-105 active:scale-95" title="前へ (◀)">
+                            <i class="fa-solid fa-backward-step text-lg"></i>
+                        </button>
+
+                        <!-- Play / Pause -->
+                        <button id="playPauseBtn" class="w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center transition shadow-lg shadow-indigo-600/40 hover:scale-105 active:scale-95 glow-effect" title="再生 / 一時停止">
+                            <i id="playIcon" class="fa-solid fa-play text-xl ml-0.5"></i>
+                        </button>
+
+                        <!-- ▶ Next -->
+                        <button id="nextBtn" class="w-12 h-12 rounded-full bg-slate-800 hover:bg-slate-700 text-white flex items-center justify-center transition shadow-lg hover:scale-105 active:scale-95" title="次へ (▶)">
+                            <i class="fa-solid fa-forward-step text-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Volume Control -->
+                    <div class="flex items-center gap-2 group relative">
+                        <button id="muteBtn" class="p-2.5 rounded-full text-slate-400 hover:text-white hover:bg-slate-800/60 transition" title="消音">
+                            <i id="volumeIcon" class="fa-solid fa-volume-high text-sm"></i>
+                        </button>
+                        <input type="range" id="volumeBar" min="0" max="1" step="0.01" value="0.8" class="w-16 sm:w-20">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-slate-800">
+
+            <!-- Playlist Header -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-semibold text-sm tracking-wide text-slate-200">連続再生リスト (001〜020)</h3>
+                    <span id="playlistCount" class="text-xs bg-slate-800 text-indigo-400 px-2.5 py-0.5 rounded-full border border-slate-700/50">20 曲</span>
+                </div>
+                <span class="text-xs text-slate-400 flex items-center gap-1">
+                    <i class="fa-solid fa-circle-check text-indigo-400"></i> MP3メタデータを自動反映
+                </span>
+            </div>
+
+            <!-- Playlist Scroll Area -->
+            <div id="playlistContainer" class="playlist-scroll max-h-72 overflow-y-auto space-y-2 pr-1">
+                <!-- Track items will be dynamically generated here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-5xl mx-auto w-full text-center text-xs text-slate-500 my-4">
+        &copy; 2026 あなたの曲をつくりませんか？ - Audio Player
+    </footer>
+
+    <!-- Audio Element -->
+    <audio id="audioPlayer" preload="metadata"></audio>
 
     <script>
-        // 曲リストの自動生成 (001 〜 020)
-        const playlist = [];
-        for (let i = 1; i <= 20; i++) {
-            // 3桁のゼロ埋め (001, 002 ... 020)
-            const filename = String(i).padStart(3, '0') + '.mp3';
-            playlist.push(filename);
-        }
+        document.addEventListener('DOMContentLoaded', () => {
+            // トラックデータおよび状態
+            let tracks = [];
+            let currentIndex = 0;
+            let isPlaying = false;
+            let isShuffle = false;
+            let isRepeat = false;
 
-        let currentIndex = 0;
-        const player = document.getElementById('audio-player');
-        const nowPlayingText = document.getElementById('now-playing');
+            // UI要素
+            const audio = document.getElementById('audioPlayer');
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const playIcon = document.getElementById('playIcon');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const seekBar = document.getElementById('seekBar');
+            const currentTimeEl = document.getElementById('currentTime');
+            const durationEl = document.getElementById('duration');
+            const volumeBar = document.getElementById('volumeBar');
+            const muteBtn = document.getElementById('muteBtn');
+            const volumeIcon = document.getElementById('volumeIcon');
+            const shuffleBtn = document.getElementById('shuffleBtn');
+            const repeatBtn = document.getElementById('repeatBtn');
 
-        function playTrack(index) {
-            if (index >= playlist.length) {
-                nowPlayingText.textContent = "すべての曲の再生が終了しました";
-                return;
+            const currentTitle = document.getElementById('currentTitle');
+            const currentArtist = document.getElementById('currentArtist');
+            const currentAlbum = document.getElementById('currentAlbum');
+            const albumArt = document.getElementById('albumArt');
+            const albumArtPlaceholder = document.getElementById('albumArtPlaceholder');
+            const playlistContainer = document.getElementById('playlistContainer');
+            const playlistCount = document.getElementById('playlistCount');
+            const folderInput = document.getElementById('folderInput');
+            const fileInput = document.getElementById('fileInput');
+            const statusToast = document.getElementById('statusToast');
+
+            // 全20曲のオリジナルタイトルおよびアーティスト情報
+            const verifiedInitialMetadata = {
+                1: { title: "Let's together with osakafringe", artist: "rojiura_m_sakou" },
+                2: { title: "Osaka Talk", artist: "rojiura_m_sakou" },
+                3: { title: "WAITA!", artist: "rojiura_m_sakou" },
+                4: { title: "Take it Fun Option", artist: "rojiura_m_sakou" },
+                5: { title: "地上の紙", artist: "rojiura_m_sakou" },
+                6: { title: "折れたティッシュ", artist: "rojiura_m_sakou" },
+                7: { title: "神保町音頭", artist: "rojiura_m_sakou" },
+                8: { title: "Books and me", artist: "rojiura_m_sakou" },
+                9: { title: "Merry Merry Berry", artist: "makoto_sako_1961" },
+                10: { title: "At dusk, we always climbed the hill", artist: "makoto_sako_1961" },
+                11: { title: "Raise your- coffee cup and sya YO", artist: "rojiura_m_sakou" },
+                12: { title: "そきほどたい", artist: "highspeedjrook8819" },
+                13: { title: "So keep hold on tight", artist: "highspeedjrook8819" },
+                14: { title: "渋谷宇田川の夕べ", artist: "rojiura_m_sakou" },
+                15: { title: "路地裏の情熱オープニングテーマ", artist: "highspeedjrook8819" },
+                16: { title: "はじまりはただのひとこと", artist: "highspeedjrook8819" },
+                17: { title: "詩吟インザモーニング", artist: "rojiura_m_sakou" },
+                18: { title: "燃えないゴミの日", artist: "rojiura_m_sakou" },
+                19: { title: "Happy birthday MIKU", artist: "rojiura_m_sakou" },
+                20: { title: "Time have change but dreams remain", artist: "rojiura_m_sakou" }
+            };
+
+            /* ============================================================
+             * 高精度 ID3v2 & ID3v1 バイナリタグパーサー
+             * 不完全なヘッダーや各種文字エンコーディング（UTF-8, UTF-16, Shift_JIS）に完全対応
+             * ============================================================ */
+            async function parseMP3MetadataDirectly(fileOrBlob) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    // 先頭1MBを読み込んでID3v2ヘッダーとフレームを探索
+                    const sliceHead = fileOrBlob.slice(0, 1024 * 1024);
+
+                    reader.onload = async function(e) {
+                        try {
+                            const buffer = e.target.result;
+                            const view = new DataView(buffer);
+                            const result = {};
+
+                            // ID3v2 判定
+                            if (view.byteLength >= 10 &&
+                                view.getUint8(0) === 0x49 && 
+                                view.getUint8(1) === 0x44 && 
+                                view.getUint8(2) === 0x33) {
+                                
+                                const version = view.getUint8(3); // 2, 3, 4
+                                const tagSize = ((view.getUint8(6) & 0x7f) << 21) |
+                                                ((view.getUint8(7) & 0x7f) << 14) |
+                                                ((view.getUint8(8) & 0x7f) << 7) |
+                                                (view.getUint8(9) & 0x7f);
+
+                                let offset = 10;
+                                const limit = Math.min(tagSize + 10, buffer.byteLength);
+
+                                while (offset < limit - 8) {
+                                    let frameId = '';
+                                    let frameSize = 0;
+                                    let headerLen = 10;
+
+                                    if (version === 2) {
+                                        frameId = String.fromCharCode(
+                                            view.getUint8(offset),
+                                            view.getUint8(offset + 1),
+                                            view.getUint8(offset + 2)
+                                        );
+                                        frameSize = (view.getUint8(offset + 3) << 16) |
+                                                    (view.getUint8(offset + 4) << 8) |
+                                                    view.getUint8(offset + 5);
+                                        headerLen = 6;
+                                    } else {
+                                        frameId = String.fromCharCode(
+                                            view.getUint8(offset),
+                                            view.getUint8(offset + 1),
+                                            view.getUint8(offset + 2),
+                                            view.getUint8(offset + 3)
+                                        );
+                                        if (version === 4) {
+                                            frameSize = ((view.getUint8(offset + 4) & 0x7f) << 21) |
+                                                        ((view.getUint8(offset + 5) & 0x7f) << 14) |
+                                                        ((view.getUint8(offset + 6) & 0x7f) << 7) |
+                                                        (view.getUint8(offset + 7) & 0x7f);
+                                        } else {
+                                            frameSize = view.getUint32(offset + 4);
+                                        }
+                                        headerLen = 10;
+                                    }
+
+                                    // パディング領域到達
+                                    if (!frameId || frameId.charCodeAt(0) === 0) break;
+                                    if (frameSize <= 0 || offset + headerLen + frameSize > buffer.byteLength) break;
+
+                                    const frameDataOffset = offset + headerLen;
+                                    const encoding = view.getUint8(frameDataOffset);
+                                    const rawBytes = new Uint8Array(buffer, frameDataOffset + 1, Math.max(0, frameSize - 1));
+
+                                    function decodeText(bytes, enc) {
+                                        try {
+                                            if (enc === 0) {
+                                                // ISO-8859-1 または 日本語環境のShift_JISフォールバック
+                                                const sjisStr = new TextDecoder('shift-jis', { fatal: false }).decode(bytes).replace(/\0/g, '').trim();
+                                                return sjisStr || new TextDecoder('iso-8859-1').decode(bytes).replace(/\0/g, '').trim();
+                                            }
+                                            if (enc === 1) return new TextDecoder('utf-16').decode(bytes).replace(/\0/g, '').trim();
+                                            if (enc === 2) return new TextDecoder('utf-16be').decode(bytes).replace(/\0/g, '').trim();
+                                            return new TextDecoder('utf-8').decode(bytes).replace(/\0/g, '').trim();
+                                        } catch (err) {
+                                            return '';
+                                        }
+                                    }
+
+                                    // タイトル (TIT2 / TT2)
+                                    if (frameId === 'TIT2' || frameId === 'TT2') {
+                                        const text = decodeText(rawBytes, encoding);
+                                        if (text) result.title = text;
+                                    }
+                                    // アーティスト (TPE1 / TP1)
+                                    else if (frameId === 'TPE1' || frameId === 'TP1') {
+                                        const text = decodeText(rawBytes, encoding);
+                                        if (text) result.artist = text;
+                                    }
+                                    // アルバム (TALB / TAL)
+                                    else if (frameId === 'TALB' || frameId === 'TAL') {
+                                        const text = decodeText(rawBytes, encoding);
+                                        if (text) result.album = text;
+                                    }
+                                    // カバーアート (APIC / PIC)
+                                    else if (frameId === 'APIC' && !result.picture) {
+                                        try {
+                                            let pOffset = frameDataOffset + 1;
+                                            let mime = "";
+                                            while (view.getUint8(pOffset) !== 0 && pOffset < frameDataOffset + frameSize) {
+                                                mime += String.fromCharCode(view.getUint8(pOffset));
+                                                pOffset++;
+                                            }
+                                            pOffset++; // null-term
+                                            pOffset++; // picture type
+                                            if (encoding === 1 || encoding === 2) {
+                                                while (pOffset + 1 < frameDataOffset + frameSize && !(view.getUint8(pOffset) === 0 && view.getUint8(pOffset + 1) === 0)) {
+                                                    pOffset += 2;
+                                                }
+                                                pOffset += 2;
+                                            } else {
+                                                while (pOffset < frameDataOffset + frameSize && view.getUint8(pOffset) !== 0) {
+                                                    pOffset++;
+                                                }
+                                                pOffset++;
+                                            }
+                                            const imgLen = (frameDataOffset + frameSize) - pOffset;
+                                            if (imgLen > 0) {
+                                                const imgBytes = new Uint8Array(buffer, pOffset, imgLen);
+                                                const blob = new Blob([imgBytes], { type: mime || 'image/jpeg' });
+                                                result.picture = URL.createObjectURL(blob);
+                                            }
+                                        } catch (e) {}
+                                    }
+
+                                    offset += headerLen + frameSize;
+                                }
+
+                                if (result.title || result.artist) {
+                                    resolve(result);
+                                    return;
+                                }
+                            }
+
+                            // ID3v1 の読み取り（ファイル末尾128バイト）
+                            if (fileOrBlob.size > 128) {
+                                const tailSlice = fileOrBlob.slice(fileOrBlob.size - 128);
+                                const tailReader = new FileReader();
+                                tailReader.onload = function(te) {
+                                    const tailBuf = te.target.result;
+                                    const tailView = new DataView(tailBuf);
+                                    if (tailView.getUint8(0) === 0x54 && tailView.getUint8(1) === 0x41 && tailView.getUint8(2) === 0x47) {
+                                        const decoder = new TextDecoder('shift-jis');
+                                        const v1Title = decoder.decode(new Uint8Array(tailBuf, 3, 30)).replace(/\0/g, '').trim();
+                                        const v1Artist = decoder.decode(new Uint8Array(tailBuf, 33, 30)).replace(/\0/g, '').trim();
+                                        const v1Album = decoder.decode(new Uint8Array(tailBuf, 63, 30)).replace(/\0/g, '').trim();
+
+                                        if (v1Title) result.title = v1Title;
+                                        if (v1Artist) result.artist = v1Artist;
+                                        if (v1Album) result.album = v1Album;
+                                    }
+                                    resolve(Object.keys(result).length > 0 ? result : null);
+                                };
+                                tailReader.onerror = () => resolve(Object.keys(result).length > 0 ? result : null);
+                                tailReader.readAsArrayBuffer(tailSlice);
+                            } else {
+                                resolve(Object.keys(result).length > 0 ? result : null);
+                            }
+                        } catch (err) {
+                            resolve(null);
+                        }
+                    };
+
+                    reader.onerror = () => resolve(null);
+                    reader.readAsArrayBuffer(sliceHead);
+                });
             }
-            currentIndex = index;
-            player.src = playlist[currentIndex];
-            nowPlayingText.textContent = `再生中: ${playlist[currentIndex]} (${currentIndex + 1}/20)`;
-            player.play().catch(e => {
-                console.log("自動再生がブロックされました。再生ボタンを押してください。", e);
+
+            // トースト通知
+            function notify(msg) {
+                statusToast.textContent = msg;
+                statusToast.classList.add('bg-indigo-600', 'text-white');
+                setTimeout(() => {
+                    statusToast.classList.remove('bg-indigo-600', 'text-white');
+                }, 4000);
+            }
+
+            // 秒数フォーマット (m:ss)
+            function formatTime(seconds) {
+                if (isNaN(seconds) || seconds === Infinity) return "0:00";
+                const mins = Math.floor(seconds / 60);
+                const secs = Math.floor(seconds % 60);
+                return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }
+
+            // 初期トラック生成 (001.mp3 〜 020.mp3)
+            function initTracks() {
+                tracks = [];
+                for (let i = 1; i <= 20; i++) {
+                    const numStr = String(i).padStart(3, '0');
+                    const fileName = `${numStr}.mp3`;
+                    const meta = verifiedInitialMetadata[i];
+
+                    tracks.push({
+                        id: i,
+                        fileName: fileName,
+                        src: `./${fileName}`,
+                        title: meta ? meta.title : fileName,
+                        artist: meta ? meta.artist : 'rojiura_m_sakou',
+                        album: 'あなたの曲をつくりませんか？',
+                        picture: null,
+                        hasMeta: true,
+                        fileObj: null
+                    });
+                }
+
+                renderPlaylist();
+                loadTrack(0);
+
+                // 同階層に配置されている場合の自動スキャン
+                attemptBackgroundFetchAll();
+            }
+
+            // バックグラウンドで相対パスからの取得を試行
+            async function attemptBackgroundFetchAll() {
+                for (let i = 0; i < tracks.length; i++) {
+                    const track = tracks[i];
+                    try {
+                        const res = await fetch(track.src);
+                        if (!res.ok) continue;
+                        const blob = await res.blob();
+                        const meta = await parseMP3MetadataDirectly(blob);
+                        if (meta) {
+                            applyMetadata(track, meta, i);
+                        }
+                    } catch (e) {
+                        // 相対パス未配置時はプリセットのまま安全に再生待機
+                    }
+                }
+            }
+
+            // メタデータの適用
+            function applyMetadata(track, meta, index) {
+                if (meta.title) track.title = meta.title;
+                if (meta.artist) track.artist = meta.artist;
+                if (meta.album) track.album = meta.album;
+                if (meta.picture) track.picture = meta.picture;
+
+                updatePlaylistRow(index);
+                if (index === currentIndex) {
+                    updatePlayerDisplay(track);
+                }
+            }
+
+            // プレイヤーメイン画面の表示更新
+            function updatePlayerDisplay(track) {
+                currentTitle.textContent = track.title;
+                currentArtist.textContent = track.artist;
+                currentAlbum.textContent = `${track.album} (${track.fileName})`;
+
+                if (track.picture) {
+                    albumArt.src = track.picture;
+                    albumArt.classList.remove('hidden');
+                    albumArtPlaceholder.classList.add('hidden');
+                } else {
+                    albumArt.src = '';
+                    albumArt.classList.add('hidden');
+                    albumArtPlaceholder.classList.remove('hidden');
+                }
+            }
+
+            // 1行のリスト表示更新
+            function updatePlaylistRow(idx) {
+                const item = playlistContainer.children[idx];
+                if (!item) return;
+                const track = tracks[idx];
+
+                const titleEl = item.querySelector('.track-title');
+                const infoEl = item.querySelector('.track-info');
+                const badge = item.querySelector('.track-badge');
+                const rightIndicator = item.querySelector('.track-right-icon');
+
+                if (titleEl) titleEl.textContent = track.title;
+                if (infoEl) infoEl.textContent = `${track.artist} • ${track.fileName}`;
+
+                if (idx === currentIndex) {
+                    item.className = 'playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-300 border text-white playing-active-item';
+                    
+                    if (isPlaying) {
+                        badge.innerHTML = `
+                            <div class="flex items-end justify-center gap-0.5 h-4 w-4">
+                                <span class="eq-bar"></span>
+                                <span class="eq-bar"></span>
+                                <span class="eq-bar"></span>
+                            </div>
+                        `;
+                    } else {
+                        badge.innerHTML = `<i class="fa-solid fa-pause text-indigo-300 text-xs"></i>`;
+                    }
+                    badge.className = 'track-badge w-8 h-8 rounded-lg bg-indigo-600/50 flex items-center justify-center shrink-0 border border-indigo-400/40';
+
+                    if (titleEl) titleEl.className = 'track-title text-sm font-bold text-white truncate drop-shadow-sm';
+                    if (rightIndicator) {
+                        rightIndicator.innerHTML = '<span class="text-[10px] uppercase tracking-wider bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 px-2 py-0.5 rounded-full font-semibold">再生中</span>';
+                    }
+                } else {
+                    item.className = 'playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 border bg-slate-800/40 border-slate-700/30 text-slate-300 hover:bg-slate-800/80';
+                    badge.innerHTML = String(idx + 1).padStart(2, '0');
+                    badge.className = 'track-badge w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-semibold text-slate-400 shrink-0';
+                    if (titleEl) titleEl.className = 'track-title text-sm font-medium text-slate-200 truncate';
+                    if (rightIndicator) {
+                        rightIndicator.innerHTML = '<i class="fa-solid fa-play text-xs text-slate-500"></i>';
+                    }
+                }
+            }
+
+            // プレイリストの全体描画
+            function renderPlaylist() {
+                playlistContainer.innerHTML = '';
+                playlistCount.textContent = `${tracks.length} 曲`;
+
+                tracks.forEach((track, index) => {
+                    const item = document.createElement('div');
+                    item.className = `playlist-item flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 border ${
+                        index === currentIndex
+                            ? 'text-white playing-active-item'
+                            : 'bg-slate-800/40 border-slate-700/30 text-slate-300 hover:bg-slate-800/80'
+                    }`;
+
+                    item.addEventListener('click', (e) => {
+                        // 編集ボタン等のクリック時を除く
+                        if (e.target.closest('.edit-btn')) return;
+                        loadTrack(index);
+                        playAudio();
+                    });
+
+                    item.innerHTML = `
+                        <div class="flex items-center gap-3 overflow-hidden pr-2 flex-1">
+                            <div class="track-badge w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center text-xs font-semibold text-slate-400 shrink-0">
+                                ${String(index + 1).padStart(2, '0')}
+                            </div>
+                            <div class="overflow-hidden flex-1">
+                                <p class="track-title text-sm font-medium truncate ${index === currentIndex ? 'text-white font-bold' : 'text-slate-200'}">
+                                    ${track.title}
+                                </p>
+                                <p class="track-info text-xs text-slate-400 truncate">
+                                    ${track.artist} • ${track.fileName}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button class="edit-btn p-1.5 text-slate-500 hover:text-indigo-300 rounded transition" title="曲名を直接編集">
+                                <i class="fa-solid fa-pen text-xs"></i>
+                            </button>
+                            <div class="track-right-icon text-xs text-slate-500">
+                                <i class="fa-solid fa-play"></i>
+                            </div>
+                        </div>
+                    `;
+
+                    // タイトルのクイック編集機能
+                    const editBtn = item.querySelector('.edit-btn');
+                    editBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const current = track.title;
+                        const modal = document.createElement('div');
+                        modal.className = 'fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4';
+                        modal.innerHTML = `
+                            <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl max-w-sm w-full space-y-4 shadow-2xl">
+                                <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-pen text-indigo-400"></i> ${track.fileName} の曲名編集
+                                </h4>
+                                <div>
+                                    <label class="text-xs text-slate-400 block mb-1">曲タイトル</label>
+                                    <input type="text" id="editTitleInput" value="${current.replace(/"/g, '&quot;')}" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                                </div>
+                                <div class="flex justify-end gap-2">
+                                    <button id="cancelEditBtn" class="px-3 py-1.5 text-xs text-slate-300 hover:bg-slate-800 rounded-lg">キャンセル</button>
+                                    <button id="saveEditBtn" class="px-4 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg shadow">保存</button>
+                                </div>
+                            </div>
+                        `;
+                        document.body.appendChild(modal);
+
+                        const input = modal.querySelector('#editTitleInput');
+                        input.focus();
+                        input.select();
+
+                        modal.querySelector('#cancelEditBtn').addEventListener('click', () => modal.remove());
+                        modal.querySelector('#saveEditBtn').addEventListener('click', () => {
+                            const val = input.value.trim();
+                            if (val) {
+                                track.title = val;
+                                updatePlaylistRow(index);
+                                if (index === currentIndex) updatePlayerDisplay(track);
+                            }
+                            modal.remove();
+                        });
+                    });
+
+                    playlistContainer.appendChild(item);
+                });
+            }
+
+            function scrollToCurrentTrack() {
+                const activeItem = playlistContainer.children[currentIndex];
+                if (activeItem) {
+                    activeItem.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
+
+            // トラック読み込み
+            function loadTrack(index) {
+                if (index < 0 || index >= tracks.length) return;
+                currentIndex = index;
+                const track = tracks[currentIndex];
+
+                audio.src = track.src;
+                audio.load();
+
+                updatePlayerDisplay(track);
+
+                for (let i = 0; i < tracks.length; i++) {
+                    updatePlaylistRow(i);
+                }
+
+                scrollToCurrentTrack();
+            }
+
+            // 再生 / 一時停止
+            function playAudio() {
+                audio.play().then(() => {
+                    isPlaying = true;
+                    playIcon.className = "fa-solid fa-pause text-xl";
+                    updatePlaylistRow(currentIndex);
+                }).catch(err => {
+                    console.log("Playback notice:", err);
+                    notify("再生音源が見つかりません。上の「フォルダを一括選択」からファイルを選択してください。");
+                });
+            }
+
+            function pauseAudio() {
+                audio.pause();
+                isPlaying = false;
+                playIcon.className = "fa-solid fa-play text-xl ml-0.5";
+                updatePlaylistRow(currentIndex);
+            }
+
+            function togglePlay() {
+                if (isPlaying) {
+                    pauseAudio();
+                } else {
+                    playAudio();
+                }
+            }
+
+            // ◀ 前へ
+            function playPrev() {
+                let prevIndex = currentIndex - 1;
+                if (prevIndex < 0) {
+                    prevIndex = tracks.length - 1;
+                }
+                loadTrack(prevIndex);
+                playAudio();
+            }
+
+            // ▶ 次へ
+            function playNext() {
+                let nextIndex;
+                if (isShuffle) {
+                    nextIndex = Math.floor(Math.random() * tracks.length);
+                    if (tracks.length > 1 && nextIndex === currentIndex) {
+                        nextIndex = (currentIndex + 1) % tracks.length;
+                    }
+                } else {
+                    nextIndex = currentIndex + 1;
+                    if (nextIndex >= tracks.length) {
+                        nextIndex = 0;
+                    }
+                }
+                loadTrack(nextIndex);
+                playAudio();
+            }
+
+            // コントロールボタン
+            playPauseBtn.addEventListener('click', togglePlay);
+            prevBtn.addEventListener('click', playPrev);
+            nextBtn.addEventListener('click', playNext);
+
+            audio.addEventListener('timeupdate', () => {
+                if (!isNaN(audio.duration)) {
+                    const progress = (audio.currentTime / audio.duration) * 100;
+                    seekBar.value = progress;
+                    currentTimeEl.textContent = formatTime(audio.currentTime);
+                    durationEl.textContent = formatTime(audio.duration);
+                }
             });
-        }
 
-        // 1曲終わったら次の曲へ自動で進む
-        player.addEventListener('ended', () => {
-            playTrack(currentIndex + 1);
+            seekBar.addEventListener('input', () => {
+                if (!isNaN(audio.duration)) {
+                    audio.currentTime = (seekBar.value / 100) * audio.duration;
+                }
+            });
+
+            // 曲終了時の連続自動再生
+            audio.addEventListener('ended', () => {
+                if (isRepeat) {
+                    audio.currentTime = 0;
+                    playAudio();
+                } else {
+                    playNext();
+                }
+            });
+
+            // 音量調節
+            volumeBar.addEventListener('input', (e) => {
+                audio.volume = e.target.value;
+                if (audio.volume === 0) {
+                    volumeIcon.className = "fa-solid fa-volume-xmark text-sm";
+                } else if (audio.volume < 0.5) {
+                    volumeIcon.className = "fa-solid fa-volume-low text-sm";
+                } else {
+                    volumeIcon.className = "fa-solid fa-volume-high text-sm";
+                }
+            });
+
+            muteBtn.addEventListener('click', () => {
+                if (audio.volume > 0) {
+                    audio.dataset.prevVolume = audio.volume;
+                    audio.volume = 0;
+                    volumeBar.value = 0;
+                    volumeIcon.className = "fa-solid fa-volume-xmark text-sm";
+                } else {
+                    const prev = audio.dataset.prevVolume || 0.8;
+                    audio.volume = prev;
+                    volumeBar.value = prev;
+                    volumeIcon.className = "fa-solid fa-volume-high text-sm";
+                }
+            });
+
+            // シャッフル & リピート
+            shuffleBtn.addEventListener('click', () => {
+                isShuffle = !isShuffle;
+                shuffleBtn.classList.toggle('text-indigo-400', isShuffle);
+                shuffleBtn.classList.toggle('bg-slate-800', isShuffle);
+                notify(isShuffle ? "シャッフル再生: ON" : "シャッフル再生: OFF");
+            });
+
+            repeatBtn.addEventListener('click', () => {
+                isRepeat = !isRepeat;
+                repeatBtn.classList.toggle('text-indigo-400', isRepeat);
+                repeatBtn.classList.toggle('bg-slate-800', isRepeat);
+                notify(isRepeat ? "1曲リピート: ON" : "連続自動再生モード");
+            });
+
+            /* ============================================================
+             * ファイル / フォルダ選択時の処理
+             * ============================================================ */
+            async function handleUploadedFiles(fileList) {
+                const files = Array.from(fileList).filter(file => file.type.startsWith('audio/') || file.name.toLowerCase().endsWith('.mp3'));
+                if (files.length === 0) {
+                    notify("MP3ファイルが見つかりませんでした。");
+                    return;
+                }
+
+                // 001.mp3, 002.mp3 等の順にソート
+                files.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' }));
+
+                tracks = [];
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const objectUrl = URL.createObjectURL(file);
+                    
+                    const match = file.name.match(/(\d+)/);
+                    const fileNum = match ? parseInt(match[1], 10) : (i + 1);
+                    const preset = verifiedInitialMetadata[fileNum];
+
+                    tracks.push({
+                        id: fileNum,
+                        fileName: file.name,
+                        src: objectUrl,
+                        title: preset ? preset.title : file.name,
+                        artist: preset ? preset.artist : 'rojiura_m_sakou',
+                        album: 'あなたの曲をつくりませんか？',
+                        picture: null,
+                        hasMeta: true,
+                        fileObj: file
+                    });
+                }
+
+                renderPlaylist();
+                loadTrack(0);
+                notify(`${tracks.length} 曲を読み込みました`);
+
+                // バイナリからカバーアートやID3メタデータを補完解析
+                for (let i = 0; i < tracks.length; i++) {
+                    const track = tracks[i];
+                    parseMP3MetadataDirectly(track.fileObj).then((meta) => {
+                        if (meta) {
+                            if (meta.title) track.title = meta.title;
+                            if (meta.artist) track.artist = meta.artist;
+                            if (meta.album) track.album = meta.album;
+                            if (meta.picture) track.picture = meta.picture;
+                            updatePlaylistRow(i);
+                            if (i === currentIndex) {
+                                updatePlayerDisplay(track);
+                            }
+                        }
+                    });
+                }
+            }
+
+            folderInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
+            fileInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
+
+            // ドラッグ＆ドロップ対応
+            window.addEventListener('dragover', (e) => e.preventDefault());
+            window.addEventListener('drop', (e) => {
+                e.preventDefault();
+                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                    handleUploadedFiles(e.dataTransfer.files);
+                }
+            });
+
+            // キーボード操作（スペース: 再生/停止, 左右キー: ◀ ▶ スキップ）
+            document.addEventListener('keydown', (e) => {
+                if (e.target.tagName === 'INPUT') return;
+                if (e.code === 'Space') {
+                    e.preventDefault();
+                    togglePlay();
+                } else if (e.code === 'ArrowLeft') {
+                    playPrev();
+                } else if (e.code === 'ArrowRight') {
+                    playNext();
+                }
+            });
+
+            // 初期化実行
+            initTracks();
         });
-
-        // 初期化（最初の曲をセット）
-        if (playlist.length > 0) {
-            player.src = playlist[0];
-            nowPlayingText.textContent = `準備完了: ${playlist[0]} (1/20)`;
-        }
     </script>
-
 </body>
 </html>
