@@ -883,9 +883,10 @@
                 // バイナリからカバーアートやID3メタデータを補完解析
                 for (let i = 0; i < tracks.length; i++) {
                     const track = tracks[i];
+                    // 007はファイル側のメタデータ文字が誤っているためタイトル上書きをスキップ
                     parseMP3MetadataDirectly(track.fileObj).then((meta) => {
                         if (meta) {
-                            if (meta.title) track.title = meta.title;
+                            if (meta.title && track.id !== 7) track.title = meta.title;
                             if (meta.artist) track.artist = meta.artist;
                             if (meta.album) track.album = meta.album;
                             if (meta.picture) track.picture = meta.picture;
@@ -898,8 +899,12 @@
                 }
             }
 
-            folderInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
-            fileInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
+            if (folderInput) {
+                folderInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
+            }
+            if (fileInput) {
+                fileInput.addEventListener('change', (e) => handleUploadedFiles(e.target.files));
+            }
 
             // ドラッグ＆ドロップ対応
             window.addEventListener('dragover', (e) => e.preventDefault());
