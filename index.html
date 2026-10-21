@@ -527,7 +527,10 @@
 
             // メタデータの適用
             function applyMetadata(track, meta, index) {
-                if (meta.title) track.title = meta.title;
+                // 007 (トラック7) のタイトルは誤ったメタデータで上書きせず「神保町音頭」を保護
+                if (meta.title && track.id !== 7) {
+                    track.title = meta.title;
+                }
                 if (meta.artist) track.artist = meta.artist;
                 if (meta.album) track.album = meta.album;
                 if (meta.picture) track.picture = meta.picture;
